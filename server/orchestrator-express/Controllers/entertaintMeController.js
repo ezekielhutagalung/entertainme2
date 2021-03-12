@@ -2,29 +2,29 @@ const axios = require("axios");
 const Redis = require("ioredis");
 const redis = new Redis();
 
-class EntertaintMeController {
+class EntertainMeController {
   static async getAll(req, res) {
     try {
-      const entertaintMeData = await redis.get("entertaintMe:data");
-      if (entertaintMeData) {
-        res.status(200).json(JSON.parse(entertaintMeData));
+      const entertainMeData = await redis.get("entertainMe:data");
+      if (entertainMeData) {
+        res.status(200).json(JSON.parse(entertainMeData));
       } else {
         const movies = await axios({
-          url: "http://localhost:3000/movies",
+          url: "http://localhost:4001/movies",
           method: "GET",
         });
         const series = await axios({
-          url: "http://localhost:3000/tvseries",
+          url: "http://localhost:4002/tvseries",
           method: "GET",
         });
 
-        const entertaintMe = {
+        const entertainMe = {
           movies: movies.data,
           tvseries: series.data,
         };
 
-        redis.set("entertainMe:data", JSON.stringify(entertaintMe));
-        res.status(200).json(entertaintMe);
+        redis.set("entertainMe:data", JSON.stringify(entertainMe));
+        res.status(200).json(entertainMe);
       }
     } catch (err) {
       console.log(err);
@@ -33,4 +33,4 @@ class EntertaintMeController {
   }
 }
 
-module.exports = EntertaintMeController;
+module.exports = EntertainMeController;

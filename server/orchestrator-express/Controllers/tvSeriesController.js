@@ -10,7 +10,7 @@ class tvSeriesController {
         res.status(200).json(JSON.parse(seriesData));
       } else {
         const series = await axios({
-          url: "http://localhost:3000/tvseries",
+          url: "http://localhost:4002/tvseries",
           method: "GET",
         });
         await redis.set("tvseries:data", JSON.stringify(series.data));
@@ -23,7 +23,7 @@ class tvSeriesController {
   static async postHandler(req, res) {
     try {
       await redis.del("tvseries:data");
-      await redis.del("entertaintMe:data");
+      await redis.del("entertainMe:data");
 
       const { title, overview, poster_path, popularity, tags } = req.body;
       const obj = {
@@ -35,7 +35,7 @@ class tvSeriesController {
       };
 
       const newSeries = await axios({
-        url: "http://localhost:3000/tvseries",
+        url: "http://localhost:4002/tvseries",
         method: "POST",
         data: obj,
       });
@@ -61,7 +61,7 @@ class tvSeriesController {
       };
 
       const updatedSeries = await axios({
-        url: `http://localhost:3000/tvseries/${id}`,
+        url: `http://localhost:4002/tvseries/${id}`,
         method: "PUT",
         data: obj,
       });
@@ -78,7 +78,7 @@ class tvSeriesController {
       await redis.del("entertainMe:data");
       const id = req.params.id;
       const deleted = await axios({
-        url: `http://localhost:3000/tvseries/${id}`,
+        url: `http://localhost:4002/tvseries/${id}`,
         method: "DELETE",
       });
       res.status(200).json(deleted.data);
