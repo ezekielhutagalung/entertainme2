@@ -12,7 +12,14 @@ class movieContorller {
 
   static async postMovie(req, res) {
     try {
-      const { title, overview, poster_path, popularity, tags } = req.body;
+      const {
+        title,
+        overview,
+        poster_path,
+        popularity,
+        tags,
+        urlMov,
+      } = req.body;
 
       const obj = {
         title,
@@ -20,6 +27,7 @@ class movieContorller {
         poster_path,
         popularity: parseFloat(popularity),
         tags,
+        urlMov,
       };
 
       console.log(obj, "ini obj");
@@ -49,13 +57,21 @@ class movieContorller {
 
   static async putMovie(req, res) {
     try {
-      const { title, overview, poster_path, popularity, tags } = req.body;
+      const {
+        title,
+        overview,
+        poster_path,
+        popularity,
+        tags,
+        urlMov,
+      } = req.body;
       const obj = {
         title,
         overview,
         poster_path,
         popularity: parseFloat(popularity),
         tags,
+        urlMov,
       };
 
       console.log(obj, "ini obj di put <<<<<");

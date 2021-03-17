@@ -7,12 +7,11 @@ const typeDefs = gql`
   type Query {
     movies: [Movie]
     Tvseries: [Tvseries]
-    movie(id: ID!): Movie
-    tvseries(id: ID!): Tvseries
+    movie(id: ID): Movie
+    tvseries(id: ID): Tvseries
   }
 
   type Status {
-    _id: ID
     message: String
   }
 
@@ -23,6 +22,7 @@ const typeDefs = gql`
     poster_path: String
     popularity: Float
     tags: [String]
+    urlMov: String
   }
 
   type Tvseries {
@@ -32,6 +32,7 @@ const typeDefs = gql`
     poster_path: String
     popularity: Float
     tags: [String]
+    urlSer: String
   }
 
   input AddInput {
@@ -40,6 +41,11 @@ const typeDefs = gql`
     poster_path: String
     popularity: Float
     tags: [String]
+    urlMov: String
+  }
+
+  input inputDelete {
+    _id: ID!
   }
 
   input AddSeriesInput {
@@ -48,6 +54,7 @@ const typeDefs = gql`
     poster_path: String
     popularity: Float
     tags: [String]
+    urlSer: String
   }
 
   input UpdateData {
@@ -57,6 +64,7 @@ const typeDefs = gql`
     poster_path: String
     popularity: Float
     tags: [String]
+    urlMov: String
   }
 
   input UpdateSeriesData {
@@ -66,6 +74,7 @@ const typeDefs = gql`
     poster_path: String
     popularity: Float
     tags: [String]
+    urlSer: String
   }
 
   type Mutation {
@@ -92,7 +101,7 @@ const resolvers = {
             url: "http://localhost:4001/movies",
           });
           await redis.set("movies:data", JSON.stringify(movies.data));
-          // console.log(movies.data)
+          console.log(movies.data, "di iget movies");
           return movies.data;
         }
       } catch (err) {
@@ -110,6 +119,7 @@ const resolvers = {
             url: "http://localhost:4002/tvseries",
           });
           await redis.set("tvseries:data", JSON.stringify(tvseries.data));
+          // console.log(tvseries.data, "ini di orchestra yg atas tvseries");
           return tvseries.data;
         }
       } catch (err) {
@@ -119,20 +129,12 @@ const resolvers = {
     movie: async (_, args) => {
       try {
         const { id } = args;
-        console.log(id, "ini di movie id");
-        const cache = await redis.get("movies:data");
-        if (cache) {
-          let filterCache = JSON.parse(cache);
-          return filterCache.find((el) => {
-            return el._id === id;
-          });
-        } else {
-          const movies = await axios({
-            method: "GET",
-            url: `http://localhost:4001/movies/${id}`,
-          });
-          return movies.data;
-        }
+        const movies = await axios({
+          method: "GET",
+          url: `http://localhost:4001/movies/${id}`,
+        });
+        // console.log(movies.data, "ini di movies data");
+        return movies.data;
       } catch (err) {
         console.log(err);
       }
@@ -141,19 +143,12 @@ const resolvers = {
       try {
         const { id } = args;
         console.log(id, "ini di movie id");
-        const cache = await redis.get("tvseries:data");
-        if (cache) {
-          let filterCache = JSON.parse(cache);
-          return filterCache.find((el) => {
-            return el._id === id;
-          });
-        } else {
-          const movies = await axios({
-            method: "GET",
-            url: `http://localhost:4002/tvseries/${id}`,
-          });
-          return movies.data;
-        }
+        const movies = await axios({
+          method: "GET",
+          url: `http://localhost:4002/tvseries/${id}`,
+        });
+        console.log(movies.data, "ini get data di orchestrator tv series");
+        return movies.data;
       } catch (err) {
         console.log(err.message);
       }
@@ -169,6 +164,7 @@ const resolvers = {
           poster_path: args.newMovie.poster_path,
           popularity: args.newMovie.popularity,
           tags: args.newMovie.tags,
+          urlMov: args.newMovie.urlMov,
         };
         console.log(newMovie, "ini new movie");
         const movie = await axios({
@@ -177,7 +173,7 @@ const resolvers = {
           data: newMovie,
         });
         await redis.del("movies:data");
-        // console.log(movie.data, "data movie");
+        console.log(movie.data, "data movie");
         return movie.data;
       } catch (err) {
         console.log(err.message);
@@ -192,6 +188,7 @@ const resolvers = {
           poster_path: args.newSeries.poster_path,
           popularity: args.newSeries.popularity,
           tags: args.newSeries.tags,
+          urlSer: args.newSeries.urlSer,
         };
         console.log(newSeries, "ini new movie");
         const movie = await axios({
@@ -208,11 +205,12 @@ const resolvers = {
     },
     deleteMovie: async (_, args) => {
       try {
-        console.log("masuk sini nihhh broo");
+        console.log(args.id, "masuk sini nihhh broo");
         const movie = await axios({
           method: "DELETE",
           url: `http://localhost:4001/movies/${args.id}`,
         });
+        console.log(movie, "ini di delte movie");
         await redis.del("movies:data");
         return movie.data;
       } catch (err) {
@@ -234,15 +232,17 @@ const resolvers = {
     },
     updateMovie: async (_, args) => {
       try {
-        console.log(args);
+        // console.log(args, "<<<< di update movie");
         const updatedMovie = {
           title: args.updatedMovie.title,
           overview: args.updatedMovie.overview,
           poster_path: args.updatedMovie.poster_path,
           popularity: args.updatedMovie.popularity,
           tags: args.updatedMovie.tags,
+          urlMov: args.updatedMovie.urlMov,
         };
-        // console.log(updatedMovie);
+        // console.log(updatedMovie, "ini updated movie shaaay");
+        // console.log(args.updatedMovie.id, "ini id");
         const movie = await axios({
           method: "PUT",
           url: `http://localhost:4001/movies/${args.updatedMovie.id}`,
@@ -263,6 +263,7 @@ const resolvers = {
           poster_path: args.updatedSeries.poster_path,
           popularity: args.updatedSeries.popularity,
           tags: args.updatedSeries.tags,
+          urlSer: args.updatedSeries.urlSer,
         };
         const series = await axios({
           method: "PUT",

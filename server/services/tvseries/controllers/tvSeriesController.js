@@ -12,7 +12,14 @@ class tvSeriesController {
 
   static async postTvSeries(req, res) {
     try {
-      const { title, overview, poster_path, popularity, tags } = req.body;
+      const {
+        title,
+        overview,
+        poster_path,
+        popularity,
+        tags,
+        urlSer,
+      } = req.body;
 
       const obj = {
         title,
@@ -20,6 +27,7 @@ class tvSeriesController {
         poster_path,
         popularity: parseFloat(popularity),
         tags,
+        urlSer,
       };
 
       console.log(obj, "ini obj");
@@ -49,13 +57,21 @@ class tvSeriesController {
 
   static async putTvSeries(req, res) {
     try {
-      const { title, overview, poster_path, popularity, tags } = req.body;
+      const {
+        title,
+        overview,
+        poster_path,
+        popularity,
+        tags,
+        urlSer,
+      } = req.body;
       const obj = {
         title,
         overview,
         poster_path,
         popularity: parseFloat(popularity),
         tags,
+        urlSer,
       };
 
       console.log(obj, "ini obj di put <<<<<");
